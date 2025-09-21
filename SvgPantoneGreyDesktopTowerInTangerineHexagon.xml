@@ -1,0 +1,8 @@
+<!-- SVG: Pantone grey desktop tower on a tangerine hexagon -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Tangerine hexagon background -->
+  <polygon points="256,24 448,128 448,320 256,424 64,320 64,128"
+           fill="#F28500"/>
+  <!-- Desktop tower (Pantone grey approximation) -->
+  <g transform="translate(176,120)">
+    <rect x="0" y="0" width="160" height="240"
