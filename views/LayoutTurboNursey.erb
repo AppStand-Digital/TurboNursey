@@ -1,0 +1,27 @@
+<!-- views/layout.erb -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>TurboNursey</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    nav a { margin-right: 1rem; }
+    .error { color: #b00020; }
+    table { border-collapse: collapse; }
+    td, th { border: 1px solid #ccc; padding: .4rem .6rem; }
+  </style>
+</head>
+<body>
+<nav>
+  <% if logged_in? %>
+    <a href="/rooms">Rooms</a>
+    <a href="/logout">Logout</a>
+  <% else %>
+    <a href="/login">Login</a>
+  <% end %>
+</nav>
+<hr/>
+<%= yield %>
+</body>
+</html>

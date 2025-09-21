@@ -1,0 +1,31 @@
+<!-- views/rooms/index.erb -->
+<h1>Rooms</h1>
+<p><a href="/rooms/new">New Room</a></p>
+<table>
+  <tr>
+    <th>When</th>
+    <th>Ward</th>
+    <th>Patient</th>
+    <th>Nurse/HCA</th>
+    <th>Mood</th>
+    <th>State</th>
+    <th></th>
+  </tr>
+  <% @rooms.each do |r| %>
+    <tr>
+      <td><%= h r[:datetime_stamp] %></td>
+      <td><%= h r[:ward] %></td>
+      <td><%= h r[:patient] %></td>
+      <td><%= h r[:nurse_or_hca] %></td>
+      <td><%= h r[:mood] %></td>
+      <td><%= h r[:sleeping_awake] %></td>
+      <td>
+        <a href="/rooms/<%= r[:_id] %>">Show</a> |
+        <a href="/rooms/<%= r[:_id] %>/edit">Edit</a>
+        <form action="/rooms/<%= r[:_id] %>/delete" method="post" style="display:inline" onsubmit="return confirm('Delete?')">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+  <% end %>
+</table>

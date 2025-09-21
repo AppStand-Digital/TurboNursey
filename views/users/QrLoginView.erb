@@ -1,0 +1,5 @@
+<!-- views/users/show_qr.erb -->
+<h2>QR Login</h2>
+<p>Scan this QR code to log in on another device:</p>
+<p><img src="<%= h @qr_url %>" alt="QR code" /></p>
+<p>Or open: <a href="<%= h @qr_login_url %>"><%= h @qr_login_url %></a></p>

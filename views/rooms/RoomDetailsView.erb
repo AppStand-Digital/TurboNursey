@@ -1,0 +1,29 @@
+<!-- views/rooms/show.erb -->
+<h1>Room</h1>
+<p><strong>When:</strong> <%= h @room[:datetime_stamp] %></p>
+<p><strong>Ward:</strong> <%= h @room[:ward] %></p>
+<p><strong>Patient:</strong> <%= h @room[:patient] %></p>
+<p><strong>Nurse/HCA:</strong> <%= h @room[:nurse_or_hca] %></p>
+<p><strong>Mood:</strong> <%= h @room[:mood] %></p>
+<p><strong>State:</strong> <%= h @room[:sleeping_awake] %></p>
+
+<h2>Answers</h2>
+<ul>
+  <% @answers.each do |a| %>
+    <li>
+      <strong><%= h a[:question] %>:</strong> <%= h a[:response] %>
+      <form action="/answers/<%= a[:_id] %>/delete" method="post" style="display:inline">
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+  <% end %>
+</ul>
+
+<h3>Add Answer</h3>
+<form method="post" action="/rooms/<%= @room[:_id] %>/answers">
+  <p>Question: <input name="question" required></p>
+  <p>Response: <input name="response" required></p>
+  <button type="submit">Add</button>
+</form>
+
+<p><a href="/rooms">Back</a></p>

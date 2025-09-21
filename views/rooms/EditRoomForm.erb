@@ -1,0 +1,19 @@
+<!-- views/rooms/edit.erb -->
+<h1>Edit Room</h1>
+<% if @error %><p class="error"><%= h @error %></p><% end %>
+<form method="post" action="/rooms/<%= h @room.is_a?(Hash) ? @room["_id"] : @room[:_id] %>">
+  <p>Date/Time: <input type="datetime-local" name="datetime_stamp" value="<%= h (@room[:datetime_stamp] || @room["datetime_stamp"]) %>"></p>
+  <p>Ward: <input name="ward" value="<%= h (@room[:ward] || @room["ward"]) %>" required></p>
+  <p>Patient: <input name="patient" value="<%= h (@room[:patient] || @room["patient"]) %>" required></p>
+  <p>Nurse/HCA: <input name="nurse_or_hca" value="<%= h (@room[:nurse_or_hca] || @room["nurse_or_hca"]) %>" required></p>
+  <p>Mood: <input name="mood" value="<%= h (@room[:mood] || @room["mood"]) %>"></p>
+  <p>State:
+    <select name="sleeping_awake">
+      <% val = (@room[:sleeping_awake] || @room["sleeping_awake"]).to_s %>
+      <option value="" <%= "selected" if val=="" %>>--</option>
+      <option <%= "selected" if val=="sleeping" %>>sleeping</option>
+      <option <%= "selected" if val=="awake" %>>awake</option>
+    </select>
+  </p>
+  <button type="submit">Save</button>
+</form>
