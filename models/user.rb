@@ -14,6 +14,10 @@ class User
     DB.users.find(email: email).first
   end
 
+  def self.find_by_nickname(nickname)
+    DB.users.find(nickname: nickname).first
+  end
+
   def self.create!(email:, password:)
     password_hash = BCrypt::Password.create(password)
     doc = { email: email.downcase, password_hash:, created_at: Time.now }

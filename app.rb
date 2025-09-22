@@ -3,6 +3,7 @@
 
 require "sinatra"
 require "sinatra/reloader" if development?
+require 'sinatra/erb'
 require "dotenv/load"
 require "rqrcode"
 require "chunky_png"
@@ -33,6 +34,9 @@ helpers do
 
   def require_login!
     redirect "/login" unless logged_in?
+  end
+  def require_admin!
+    redirect "/login" unless current_user[:admin] == true
   end
 
   def h(text)
@@ -66,21 +70,25 @@ get "/logout" do
 end
 
 # QR Login
-get "/users/:id/qr" do
-  require_login!
-  user = DB.users.find(_id: BSON::ObjectId.from_string(params[:id])).first or halt 404
-  token = User.generate_login_token!(user[:_id])
-  base = ENV.fetch("APP_BASE_URL", request.base_url)
-  url = "#{base}/qr_login?token=#{token}"
+get "/shift" do
+  @agents = []
+  require_admin!
+  agents = DB.users.find(active:true).all or halt 404
+  agents.each do |agent|
+    token = User.generate_login_token!(agents[:_id])
+    base = ENV.fetch("APP_BASE_URL", request.base_url)
+    url = "#{base}/qr_login?token=#{token}"
 
-  png_path = File.join("public", "qrcodes", "#{token}.png")
-  qrcode = RQRCode::QRCode.new(url)
-  png = qrcode.as_png(size: 300, border_modules: 4)
-  File.binwrite(png_path, png.to_s)
+    png_path = File.join("public", "qrcodes", "#{token}.png")
+    qrcode = RQRCode::QRCode.new(url)
+    png = qrcode.as_png(size: 300, border_modules: 4)
+    File.binwrite(png_path, png.to_s)
 
-  @user = user
-  @qr_url = "/qrcodes/#{token}.png"
-  @qr_login_url = url
+    # @user = agent
+    # @qr_url = "/qrcodes/#{token}.png"
+    # @qr_login_url = url
+    @agents << {agent: @user, qr_url: "/qrcodes/#{token}.png", qr_login_url: url}
+  end
   erb :"users/show_qr"
 end
 
