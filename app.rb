@@ -3,7 +3,7 @@
 
 require "sinatra"
 require "sinatra/reloader" if development?
-require 'sinatra/erb'
+# require 'sinatra/erb'
 require "dotenv/load"
 require "rqrcode"
 require "chunky_png"
@@ -25,7 +25,7 @@ end
 
 helpers do
   def current_user
-    @current_user ||= (session[:user_id] && DB.users.find(_id: BSON::ObjectId.from_string(session[:user_id])).first)
+    @current_user ||= session[:user_id] && DB.users.find(_id: BSON::ObjectId.from_string(session[:user_id])).first
   end
 
   def logged_in?

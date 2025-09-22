@@ -18,9 +18,9 @@ class User
     DB.users.find(nickname: nickname).first
   end
 
-  def self.create!(email:, password:)
+  def self.create!(email:, password: ,nickname:,nurse:,hca:,admin:)
     password_hash = BCrypt::Password.create(password)
-    doc = { email: email.downcase, password_hash:, created_at: Time.now }
+    doc = { email: email.downcase, password_hash:, created_at: Time.now, nickname: nickname,nurse: nurse,hca:hca,admin:admin }
     res = DB.users.insert_one(doc)
     DB.users.find(_id: res.inserted_id).first
   end
