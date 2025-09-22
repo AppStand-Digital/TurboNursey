@@ -8,7 +8,7 @@ Mongo::Logger.logger.level = Logger::WARN
 
 module DB
   def self.client
-    @client ||= Mongo::Client.new(ENV.fetch("MONGODB_URI", "mongodb://localhost:27017/turbo_nursey"))
+    @client ||= Mongo::Client.new("mongodb+srv://weeble:nhs@turbonursey.54cvwpo.mongodb.net/")
   end
 
   def self.db

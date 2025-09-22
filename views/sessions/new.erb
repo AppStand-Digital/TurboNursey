@@ -1,0 +1,126 @@
+<html>
+<!-- HTML -->
+<h1>Scan Your Qr Code To Login</h1>
+<video id="qr-video" autoplay playsinline style="width: 100%; max-width: 420px; border-radius: 8px;align-content: center"></video>
+<canvas id="qr-canvas" style="display:none;align-content: center;"></canvas>
+<div id="qr-result"></div>
+<button id="qr-stop" hidden>Stop</button>
+
+<script type="module">
+// JavaScript
+const video = document.getElementById("qr-video");
+const canvas = document.getElementById("qr-canvas");
+const ctx = canvas.getContext("2d");
+const resultEl = document.getElementById("qr-result");
+const stopBtn = document.getElementById("qr-stop");
+
+let stream;
+let rafId;
+let running = false;
+let barcodeDetector;
+
+// Try native BarcodeDetector first (fast and battery-friendly)
+async function initNativeDetector() {
+  if ("BarcodeDetector" in window) {
+    const formats = await BarcodeDetector.getSupportedFormats?.() || [];
+    if (formats.includes("qr_code") || formats.length) {
+      barcodeDetector = new BarcodeDetector({ formats: ["qr_code"] });
+      return true;
+    }
+  }
+  return false;
+}
+
+async function startCamera() {
+  // Prefer back camera if available
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: "environment" } },
+    audio: false
+  });
+  video.srcObject = stream;
+  await video.play();
+  stopBtn.hidden = false;
+}
+
+function stopCamera() {
+  running = false;
+  stopBtn.hidden = true;
+  if (rafId) cancelAnimationFrame(rafId);
+  if (video.srcObject) {
+    video.srcObject.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
+}
+
+stopBtn.addEventListener("click", stopCamera);
+
+function showResult(text) {
+  resultEl.textContent = `QR: ${text}`;
+}
+
+// Native detection loop
+async function scanWithNative() {
+  if (!running) return;
+  try {
+    const barcodes = await barcodeDetector.detect(video);
+    const qr = barcodes.find(b => (b.format || b.rawValue) && (b.format === "qr_code" || true));
+    if (qr) {
+      showResult(qr.rawValue || qr.cornerPoints ? qr.rawValue : "");
+      stopCamera();
+      return;
+    }
+  } catch (e) {
+    // If native detector fails mid-flight, we can fall back to canvas loop
+    console.warn("BarcodeDetector error, falling back:", e);
+    scanWithCanvasFallback(); // switch loop
+    return;
+  }
+  rafId = requestAnimationFrame(scanWithNative);
+}
+
+// Canvas fallback loop (plug in your decoder here if needed)
+function scanWithCanvasFallback() {
+  if (!running) return;
+  if (video.readyState >= 2) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // At this point you can run a JS decoder on the canvas image data.
+    // Example: integrate a library like jsQR:
+    //
+    // const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    // const code = jsQR(imageData.data, canvas.width, canvas.height);
+    // if (code) { showResult(code.data); stopCamera(); return; }
+  }
+  rafId = requestAnimationFrame(scanWithCanvasFallback);
+}
+
+async function startQR() {
+  if (!("mediaDevices" in navigator) || !navigator.mediaDevices.getUserMedia) {
+    resultEl.textContent = "Camera API not supported in this browser.";
+    return;
+  }
+  try {
+    await startCamera();
+    running = true;
+    const hasNative = await initNativeDetector();
+    if (hasNative && barcodeDetector) {
+      scanWithNative();
+    } else {
+      // Fallback: canvas + decoder library (e.g., jsQR)
+      // resultEl.textContent = "Using fallback scanner...";
+      scanWithCanvasFallback();
+    }
+  } catch (err) {
+    console.error(err);
+    resultEl.textContent = "Failed to start camera. Check permissions or use HTTPS.";
+  }
+}
+
+// Auto-start on load; on iOS you may need to start on user interaction.
+document.addEventListener("DOMContentLoaded", () => {
+  startQR();
+});
+</script>
+</html>

@@ -17,7 +17,7 @@ require_relative "./models/answer"
 configure do
   enable :sessions
   set :session_secret, ENV.fetch("SESSION_SECRET", SecureRandom.hex(32))
-  DB.ensure_indexes!
+  # DB.ensure_indexes!
   Dir.mkdir("public") unless Dir.exist?("public")
   Dir.mkdir(File.join("public", "qrcodes")) unless Dir.exist?(File.join("public", "qrcodes"))
 end
@@ -41,7 +41,7 @@ helpers do
 end
 
 get "/" do
-  redirect "/rooms"
+  redirect "/login"
 end
 
 # Sessions
