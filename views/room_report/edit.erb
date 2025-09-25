@@ -1,4 +1,4 @@
-<!-- views/rooms/edit.erb -->
+<!-- views/room_report/edit.erb -->
 <h1>Edit Room</h1>
 <% if @error %><p class="error"><%= h @error %></p><% end %>
 <form method="post" action="/rooms/<%= h @room.is_a?(Hash) ? @room["_id"] : @room[:_id] %>">

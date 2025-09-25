@@ -1,0 +1,8 @@
+<!-- views/users/admin_dashboard.erb -->
+<h2>Admin Dashboard</h2>
+<p>Welcome, <%= h(current_user[:email]) %></p>
+<nav>
+  <a href="/rooms">Rooms</a> |
+  <a href="/shift">QR Shift</a> |
+  <a href="/logout">Logout</a>
+</nav>

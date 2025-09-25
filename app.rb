@@ -10,9 +10,10 @@ require "chunky_png"
 require "securerandom"
 require "time"
 require "mongo"
+Dotenv.load
 require_relative "./models/mongo_client"
 require_relative "./models/user"
-require_relative "./models/room"
+require_relative "./models/room_report"
 require_relative "./models/answer"
 
 configure do
@@ -22,7 +23,6 @@ configure do
   Dir.mkdir("public") unless Dir.exist?("public")
   Dir.mkdir(File.join("public", "qrcodes")) unless Dir.exist?(File.join("public", "qrcodes"))
 end
-
 helpers do
   def current_user
     @current_user ||= session[:user_id] && DB.users.find(_id: BSON::ObjectId.from_string(session[:user_id])).first
@@ -36,7 +36,7 @@ helpers do
     redirect "/login" unless logged_in?
   end
   def require_admin!
-    redirect "/login" unless current_user[:admin] == true
+    redirect "/admin/login" unless current_user && current_user[:admin] == true
   end
 
   def h(text)
@@ -57,7 +57,7 @@ post "/login" do
   user = User.find_by_email(params["email"].to_s.strip.downcase)
   if user && User.valid_password?(user, params["password"].to_s)
     session[:user_id] = user[:_id].to_s
-    redirect "/rooms"
+    redirect "/room_report"
   else
     @error = "Invalid credentials"
     erb :"sessions/new"
@@ -69,13 +69,29 @@ get "/logout" do
   redirect "/login"
 end
 
-# QR Login
+# Admin sessions
+get "/admin/login" do
+  erb :"sessions/admin_new"
+end
+
+post "/admin/login" do
+  user = User.find_by_email(params["email"].to_s.strip.downcase)
+  if user && user[:admin] == true && User.valid_password?(user, params["password"].to_s)
+    session[:user_id] = user[:_id].to_s
+    redirect "/shift"
+  else
+    @error = "Invalid admin credentials"
+    erb :"sessions/admin_new"
+  end
+end
+
 get "/shift" do
-  @agents = []
   require_admin!
-  agents = DB.users.find(active:true).all or halt 404
+  @agents = []
+  agents = User.find_all_active(true)
+  puts agents.count
   agents.each do |agent|
-    token = User.generate_login_token!(agents[:_id])
+    token = User.generate_login_token!(agent.fetch("_id"))
     base = ENV.fetch("APP_BASE_URL", request.base_url)
     url = "#{base}/qr_login?token=#{token}"
 
@@ -87,7 +103,7 @@ get "/shift" do
     # @user = agent
     # @qr_url = "/qrcodes/#{token}.png"
     # @qr_login_url = url
-    @agents << {agent: @user, qr_url: "/qrcodes/#{token}.png", qr_login_url: url}
+    @agents << {agent: agent, qr_url: "/qrcodes/#{token}.png", qr_login_url: url}
   end
   erb :"users/show_qr"
 end
@@ -98,73 +114,73 @@ get "/qr_login" do
   user = User.consume_login_token!(token)
   if user
     session[:user_id] = user[:_id].to_s
-    redirect "/rooms"
+    redirect "/room_report"
   else
     halt 401, "Invalid or consumed token"
   end
 end
 
 # Rooms CRUD
-get "/rooms" do
+get "/room_report" do
   require_login!
-  @rooms = Room.all.to_a
-  erb :"rooms/index"
+  @rooms = RoomReport.all.to_a
+  erb :"room_report/index"
 end
 
-get "/rooms/new" do
+get "/room_report/new" do
   require_login!
   @room = {}
-  erb :"rooms/new"
+  erb :"room_report/new"
 end
 
-post "/rooms" do
+post "/room_report" do
   require_login!
   begin
-    room = Room.create!(params)
-    redirect "/rooms/#{room[:_id]}"
+    room = RoomReport.create!(params)
+    redirect "/room_report/#{room[:_id]}"
   rescue => e
     @error = e.message
     @room = params
-    erb :"rooms/new"
+    erb :room_report/new
   end
 end
 
-get "/rooms/:id" do
+get "/room_report/:id" do
   require_login!
-  @room = Room.find(params[:id]) or halt 404
+  @room = RoomReport.find(params[:id]) or halt 404
   @answers = Answer.for_room(params[:id]).to_a
-  erb :"rooms/show"
+  erb :room_report/show
 end
 
-get "/rooms/:id/edit" do
+get "/room_report/:id/edit" do
   require_login!
-  @room = Room.find(params[:id]) or halt 404
-  erb :"rooms/edit"
+  @room = RoomReport.find(params[:id]) or halt 404
+  erb :room_report/edit
 end
 
-post "/rooms/:id" do
+post "/room_report/:id" do
   require_login!
   begin
-    Room.update!(params[:id], params)
-    redirect "/rooms/#{params[:id]}"
+    RoomReport.update!(params[:id], params)
+    redirect "/room_report/#{params[:id]}"
   rescue => e
     @error = e.message
     @room = params.merge("_id" => params[:id])
-    erb :"rooms/edit"
+    erb :room_report/edit
   end
 end
 
-post "/rooms/:id/delete" do
+post "/room_report/:id/delete" do
   require_login!
-  Room.destroy!(params[:id])
-  redirect "/rooms"
+  RoomReport.destroy!(params[:id])
+  redirect "/room_report"
 end
 
 # Answers
-post "/rooms/:id/answers" do
+post "/room_report/:id/answers" do
   require_login!
   Answer.add!(room_id: params[:id], question: params["question"], response: params["response"])
-  redirect "/rooms/#{params[:id]}"
+  redirect "/room_report/#{params[:id]}"
 end
 
 post "/answers/:id/delete" do

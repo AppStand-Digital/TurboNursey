@@ -1,0 +1,8 @@
+<!-- views/sessions/admin_new.erb -->
+<form method="post" action="/admin/login">
+  <h2>Admin Login</h2>
+  <% if @error %><p style="color:red;"><%= h(@error) %></p><% end %>
+  <label>Email <input type="email" name="email" required></label><br>
+  <label>Password <input type="password" name="password" required></label><br>
+  <button type="submit">Login</button>
+</form>

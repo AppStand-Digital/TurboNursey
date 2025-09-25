@@ -8,7 +8,7 @@ Mongo::Logger.logger.level = Logger::WARN
 
 module DB
   def self.client
-    @client ||= Mongo::Client.new( ENV [],database: ENV["SELECTED_DATABASE"])
+    @client ||= Mongo::Client.new( ENV["MONGODB_URI"],database: ENV["SELECTED_DATABASE"])
   end
 
   def self.db

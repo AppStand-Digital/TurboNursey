@@ -1,10 +1,10 @@
-# models/room.rb
+# models/room_report.rb
 # frozen_string_literal: true
 
 require "time"
 require_relative "./mongo_client"
 
-class Room
+class RoomReport
   REQUIRED = %i[datetime_stamp ward patient nurse_or_hca].freeze
 
   def self.all

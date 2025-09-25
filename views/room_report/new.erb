@@ -1,15 +1,14 @@
-<!-- views/rooms/new.erb -->
-<h1>New Room</h1>
+<!-- views/room_report/new.erb -->
+<h1>Room Report</h1>
 <% if @error %><p class="error"><%= h @error %></p><% end %>
 <form method="post" action="/rooms">
-  <p>Date/Time: <input type="datetime-local" name="datetime_stamp" required></p>
+  <p>Date/Time: <input type="datetime-local" name="datetime_stamp" value="<%= Time.now.strftime('%Y-%m-%dT%H:%M')  %>" required></p>
   <p>Ward: <input name="ward" required></p>
   <p>Patient: <input name="patient" required></p>
   <p>Nurse/HCA: <input name="nurse_or_hca" required></p>
   <p>Mood: <input name="mood"></p>
   <p>State:
     <select name="sleeping_awake">
-      <option value="">--</option>
       <option>sleeping</option>
       <option>awake</option>
     </select>

@@ -1,28 +1,67 @@
 <!-- views/layout.erb -->
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>TurboNursey</title>
+  <meta charset="utf-8">
+  <title><%= h(@title || "App") %></title>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
-    nav a { margin-right: 1rem; }
-    .error { color: #b00020; }
-    table { border-collapse: collapse; }
-    td, th { border: 1px solid #ccc; padding: .4rem .6rem; }
+    .navbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #1f2937; /* slate-800 */
+      color: #fff;
+    }
+    .navbar .brand {
+      font-weight: 700;
+      margin-right: auto;
+      text-decoration: none;
+      color: #fff;
+    }
+    .btn-link {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #fff;
+      background: #3b82f6; /* blue-500 */
+      transition: background 0.2s ease;
+    }
+    .btn-link:hover { background: #2563eb; } /* blue-600 */
+    .btn-secondary {
+      background: #10b981; /* emerald-500 */
+    }
+    .btn-secondary:hover { background: #059669; } /* emerald-600 */
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.08);
+    }
   </style>
 </head>
 <body>
-<nav>
-  <% if logged_in? %>
-    <a href="/shift">Patient Night Ops QR Board</a>
-    <a href="/rooms">Rooms</a>
-    <a href="/logout">Logout</a>
-  <% else %>
-    <a href="/login">QR-Login</a>
-  <% end %>
-</nav>
-<hr/>
-<%= yield %>
+  <nav class="navbar">
+    <a class="brand" href="/">TurboNursey</a>
+
+    <% if logged_in? %>
+      <a class="btn-link" href="/room_report">Room Reports For Today</a>
+      <a class="btn-link btn-secondary" href="/rooms/new">New Room</a>
+
+      <% if current_user && current_user[:admin] == true %>
+        <a class="btn-link" href="/admin">Admin</a>
+        <a class="btn-link" href="/shift">QR Shift</a>
+      <% end %>
+
+      <a class="btn-link btn-ghost" href="/logout">Logout</a>
+    <% else %>
+      <a class="btn-link" href="/login">Login</a>
+      <a class="btn-link btn-ghost" href="/admin/login">Admin</a>
+    <% end %>
+  </nav>
+
+  <%= yield %>
 </body>
 </html>
