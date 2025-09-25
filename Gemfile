@@ -3,8 +3,6 @@
 
 source "https://rubygems.org"
 
-ruby "3.4.6"
-
 gem "sinatra", "~> 4.0"          # Web framework
 gem "puma", "~> 6.5"             # Rack server for production
 gem "rack", ">= 3.0"             # Sinatra 4 runs on Rack 3
