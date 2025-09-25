@@ -1,0 +1,1 @@
+bind "unix:///var/run/nhs.sock"

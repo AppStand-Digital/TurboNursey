@@ -10,6 +10,7 @@ GEM
     dotenv (3.1.8)
     ffi (1.17.2-x64-mingw-ucrt)
     ffi (1.17.2-x86_64-linux-gnu)
+    fileutils (1.7.3)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -83,6 +84,7 @@ DEPENDENCIES
   bson (~> 5.1)
   chunky_png (~> 1.4)
   dotenv (~> 3.1)
+  fileutils
   mongo (~> 2.20)
   puma (~> 6.5)
   rack (>= 3.0)

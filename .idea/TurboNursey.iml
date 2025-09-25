@@ -321,6 +321,36 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
+      <library name="fileutils (v1.7.3) [path][gem]" type="rubylib">
+        <properties>
+          <option name="additionalInfo">
+            <AdditionalInfo>
+              <option name="authors" value="N/A" />
+              <option name="email" value="N/A" />
+              <option name="homepage" value="N/A" />
+              <option name="summary" value="N/A" />
+            </AdditionalInfo>
+          </option>
+          <option name="fromPath" value="true" />
+          <option name="name" value="fileutils" />
+          <option name="requirePaths">
+            <list>
+              <option value="lib" />
+            </list>
+          </option>
+          <option name="url" value="file://$MODULE_DIR$/vendor/bundle/ruby/3.2.0/gems/fileutils-1.7.3" />
+          <option name="version" value="1.7.3" />
+        </properties>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/vendor/bundle/ruby/3.2.0/gems/fileutils-1.7.3/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/vendor/bundle/ruby/3.2.0/gems/fileutils-1.7.3/lib" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
       <library name="listen (v3.9.0) [path][gem]" type="rubylib">
         <properties>
           <option name="additionalInfo">
@@ -1205,5 +1235,6 @@
         </excluded>
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="bundler (v2.6.9, ruby-3.2.3-p157) [gem]" level="application" />
   </component>
 </module>
