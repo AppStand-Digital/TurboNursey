@@ -10,8 +10,8 @@ task :setup do
   # Setup nginx config
   nginx_config = <<-CONF
 server {
-  listen 80;
-  server_name localhost;
+  listen nhs.rubystand.io:80;
+  server_name firebase;
   root #{Dir.pwd}/public;
 
   location / {
