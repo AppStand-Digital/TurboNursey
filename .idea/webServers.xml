@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="a8aef4ae-0334-42f1-9192-c2f2e42def0f" name="firebase" url="https://firebase.rubystand.io">
-        <fileTransfer rootFolder="/home/weeble" accessType="SFTP" host="firebase.rubystand.io" port="22" sshConfigId="7de7b009-3be8-41a3-aace-d8e8a93cc0f0" sshConfig="weeble@firebase.rubystand.io:22 password">
+        <fileTransfer rootFolder="/var/www" accessType="SFTP" host="firebase.rubystand.io" port="22" sshConfigId="7de7b009-3be8-41a3-aace-d8e8a93cc0f0" sshConfig="root@firebase.rubystand.io:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" isUseRsync="true" />
           </advancedOptions>

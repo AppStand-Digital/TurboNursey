@@ -1,44 +1,21 @@
-require "fileutils"
-
-desc "Setup application"
-task :setup do
-  puts "Setting up application..."
-
-  # Create directories
-  FileUtils.mkdir_p ["log", "tmp"]
-
-  # Setup nginx config
-  nginx_config = <<-CONF
+# ... existing code ...
+def nginx_site_config_http
+  <<-CONF
 server {
-  listen nhs.rubystand.io:80;
-  server_name firebase;
-  root #{Dir.pwd}/public;
+  listen 80;
+  server_name #{APP_DOMAIN};
+  root #{PUBLIC_DIR};
 
   location / {
-    proxy_pass http://unix:/var/run/nhs.sock;
-    proxy_set_header Host $host;
+    include uwsgi_params;
+    uwsgi_pass unix://#{UWSGI_SOCKET};
+    uwsgi_modifier1 7;
   }
+
+  access_log /var/log/nginx/nhs.access.log;
+  error_log  /var/log/nginx/nhs.error.log;
 }
   CONF
-
-  File.write("/etc/nginx/sites-available/nhs", nginx_config)
-  FileUtils.ln_sf("/etc/nginx/sites-available/nhs", "/etc/nginx/sites-enabled/")
 end
 
-desc "Start application"
-task :start do
-  sh "bundle exec puma -C config/puma.rb"
-end
-
-desc "Stop application"
-task :stop do
-  sh "pkill -f puma"
-end
-
-desc "Restart nginx"
-task :nginx_restart do
-  sh "sudo service nginx restart"
-end
-
-desc "Deploy application"
-task deploy: [:setup, :start, :nginx_restart]
+# ... existing code ...

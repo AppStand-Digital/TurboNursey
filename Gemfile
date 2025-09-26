@@ -17,9 +17,6 @@ gem "bson", "~> 5.1"
 gem "bigdecimal", "~> 3.2"
 gem "bcrypt", "~> 3.1"
 gem 'fileutils'
-gem 'json'
-gem 'bcrypt'
-gem 'sinatra-flash'
 gem 'rake'
 
 group :development do
