@@ -1,5 +1,11 @@
 # config/puma.rb
 require "fileutils"
+require "dotenv"
+
+# Load .env from the project root regardless of current working directory
+Dotenv.load(File.expand_path("../.env", __dir__))
+
+# Ensure required dirs exist before Puma writes pid/state/logs
 FileUtils.mkdir_p(%w[tmp/pids log])
 FileUtils.mkdir_p("/run/nhs") rescue nil
 

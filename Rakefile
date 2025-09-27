@@ -8,11 +8,11 @@ LOG_DIR          = File.join(PROJECT_ROOT, "log")
 TMP_DIR          = File.join(PROJECT_ROOT, "tmp")
 PIDS_DIR         = File.join(TMP_DIR, "pids")
 
-NGINX_SITE_AVAILABLE = "/etc/nginx/sites-available/nhs"
-NGINX_SITE_ENABLE = "/etc/nginx/sites-enabled/nhs"
+NGINX_SITE_AVAILABLE = "/etc/nginx/sites-available/nhs.conf"
+NGINX_SITE_ENABLE = "/etc/nginx/sites-enabled/nhs.conf"
 PUMA_SOCKET_PATH = "/var/run/nhs.sock"
-NGINX_SSL_CERT   = ENV.fetch("NGINX_SSL_CERT", "/etc/ssl/certs/ssl-cert-snakeoil.pem")
-NGINX_SSL_KEY    = ENV.fetch("NGINX_SSL_KEY",  "/etc/ssl/private/ssl-cert-snakeoil.key")
+NGINX_SSL_CERT   = ENV.fetch("NGINX_SSL_CERT", "/etc/letsencrypt/live/#{ENV.fetch('APP_DOMAIN', 'localhost')}/fullchain.pem")
+NGINX_SSL_KEY    = ENV.fetch("NGINX_SSL_KEY",  "/etc/letsencrypt/live/#{ENV.fetch('APP_DOMAIN', 'localhost')}/privkey.pem")
 
 def assert_not_root!(action = "run this task")
   abort "Refusing to #{action} as root. Run as a non-root user." if Process.uid.zero?
@@ -186,3 +186,28 @@ end
 
 desc "Reinstall: uninstall then deploy"
 task :reinstall => [:uninstall, :deploy]
+
+desc "Obtain/renew Let's Encrypt certificate via webroot (sudo). Uses APP_DOMAIN and PUBLIC_DIR"
+task :certbot do
+  require_root!("certbot")
+  ensure_dirs
+  sh "certbot certonly --webroot -w #{PUBLIC_DIR} -d #{APP_DOMAIN} --agree-tos -n -m admin@#{APP_DOMAIN} || true"
+  puts "Certbot finished. Certs (if issued): /etc/letsencrypt/live/#{APP_DOMAIN}/"
+end
+
+desc "Deploy full stack: bundle, ensure secret, install Nginx (HTTPS), run Certbot, start Puma, reload Nginx"
+task :deploy_full => [:bundle, :generate_session_secret] do
+  # 1) Obtain/renew certificate first (HTTP-01 uses port 80; avoids boot order issues)
+  sh "sudo rake certbot"
+
+  # 2) Install/refresh Nginx site for HTTPS (points to LE certs by default if env unset)
+  sh "sudo rake nginx_install_https"
+
+  # 3) Start Puma on the Unix socket
+  Rake::Task[:start].invoke
+
+  # 4) Reload Nginx to ensure it picks up current socket/certs
+  Rake::Task[:nginx_restart].invoke
+
+  puts "Deploy full completed."
+end
