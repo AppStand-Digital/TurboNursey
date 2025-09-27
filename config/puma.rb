@@ -1,5 +1,8 @@
-# Ruby
-# Puma config reads environment from RACK_ENV/APP_ENV; defaults to development.
+# config/puma.rb
+require "fileutils"
+FileUtils.mkdir_p(%w[tmp/pids log])
+FileUtils.mkdir_p("/run/nhs") rescue nil
+
 env = ENV.fetch("RACK_ENV", ENV.fetch("APP_ENV", "development"))
 
 environment env
@@ -36,7 +39,7 @@ worker_shutdown_timeout Integer(ENV.fetch("PUMA_WORKER_SHUTDOWN_TIMEOUT", 30))
 
 # Hooks
 on_worker_boot do
-  # Reconnect resources here (DB, cache, etc.)
+  # Reconnect resources if needed
 end
 
 plugin :tmp_restart
